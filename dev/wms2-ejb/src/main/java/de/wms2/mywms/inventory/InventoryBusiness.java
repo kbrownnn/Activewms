@@ -111,7 +111,7 @@ public class InventoryBusiness {
 	private ClientBusiness clientBusiness;
 
 	public void cleanupDeleted() throws BusinessException {
-		List<UnitLoad> unitLoads = unitLoadService.readList(null, null, null, StockState.DELETABLE, null);
+		List<UnitLoad> unitLoads = unitLoadService.readList(null, null, null, null, null, StockState.DELETABLE, null);
 		for (UnitLoad unitLoad : unitLoads) {
 			trashHandler.removeUnitLoad(unitLoad);
 		}
@@ -867,6 +867,45 @@ public class InventoryBusiness {
 		}
 
 		return toStock;
+	}
+
+	/**
+	 * Move the reservations of a stock unit to a different stock unit.
+	 * <p>
+	 * The active picks are transferred too. So make sure that this is a valid
+	 * operation. The picking logic is not checked.
+	 */
+	public void transferReservation(StockUnit fromStock, StockUnit toStock) throws BusinessException {
+		String logStr = "transferReservation ";
+		logger.log(Level.FINE, logStr + "fromStock=" + fromStock + ", toStock=" + toStock);
+
+		if (fromStock.getReservedAmount().compareTo(BigDecimal.ZERO) <= 0) {
+			return;
+		}
+
+		if (!fromStock.getItemData().equals(toStock.getItemData())) {
+			logger.log(Level.WARNING, logStr + "Will not transfer reservation to different itemData. from-itemData="
+					+ fromStock.getItemData() + " to-itemData=" + toStock.getItemData());
+			return;
+		}
+
+		BigDecimal newReservedAmount = toStock.getReservedAmount().add(fromStock.getReservedAmount());
+		if (newReservedAmount.compareTo(toStock.getAmount()) > 0) {
+			logger.log(Level.WARNING, logStr + "New reservation exceeds amount. amount=" + toStock.getAmount()
+					+ ", newReservedAmount=" + newReservedAmount);
+			throw new BusinessException(Wms2BundleResolver.class, "Inventory.transferNotAllowed");
+		}
+
+		fromStock.setReservedAmount(BigDecimal.ZERO);
+		toStock.setReservedAmount(newReservedAmount);
+
+		List<PickingOrderLine> picks = pickingOrderLineEntityService.readBySourceStockUnit(fromStock);
+		for (PickingOrderLine pick : picks) {
+			if (pick.getState() < OrderState.PICKED) {
+				pick.setPickFromStockUnit(toStock);
+				pick.setPickFromUnitLoadLabel(toStock.getUnitLoad().getLabelId());
+			}
+		}
 	}
 
 	/**

@@ -476,3 +476,64 @@ Release 2.7
     - Table Report got new attributes: reportVersion, state
     - Table GoodsReceiptLine got new attribute: packagingUnit
     - Table OrderStrategy got new attribute: completeHandling. And lost attribute: completeOnly
+
+
+
+Release 2.8
+-----------
+
+    Main topics
+    -------------------------------------------------------------------------------
+    - Reports got QR codes and images
+
+
+    Functional changes (for details and complete list have a look to the git repository)
+    -------------------------------------------------------------------------------
+    - Renamed default sequence names
+    - Setup of default zone flow
+    - Locale in setup defaults to local locale
+    - Extended demodata setup
+
+    Technical changes (for details and complete list have a look to the git repository)
+    -------------------------------------------------------------------------------
+
+
+    Bugfixes (for details and complete list have a look to the git repository)
+    -------------------------------------------------------------------------------
+    - Replenish process with complete unit loads did not handle reservations and strategy date
+    - Do not allow negative reservation amounts
+
+
+    Database changes
+    -------------------------------------------------------------------------------
+
+
+
+Release 2.9
+-----------
+
+    Main topics
+    -------------------------------------------------------------------------------
+    - Lifting capacities for rack-fields and -sections
+    - Added usable location clusters as layers to storage strategy
+
+
+    Functional changes (for details and complete list have a look to the git repository)
+    -------------------------------------------------------------------------------
+
+
+    Technical changes (for details and complete list have a look to the git repository)
+    -------------------------------------------------------------------------------
+
+
+    Bugfixes (for details and complete list have a look to the git repository)
+    -------------------------------------------------------------------------------
+    - Fixed error when deleting a capacity
+
+
+    Database changes
+    -------------------------------------------------------------------------------
+    - Table StorageLocation got new attributes
+    - Table LocationType got new attributes
+    - Table StorageStrategy got new attributes
+    - Added table StorageStrategyLayer
